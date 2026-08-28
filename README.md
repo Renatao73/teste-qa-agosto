@@ -165,3 +165,4 @@ postman/Demoblaze_QA.postman_environment.json
 ```
 
 A Collection cobre criação de conta, duplicidade, login válido/inválido, adição de três produtos e consulta do carrinho.
+
