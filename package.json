@@ -1,0 +1,27 @@
+{
+  "name": "desafio-qa-cypress",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automação Cypress + BDD para o fluxo principal do DemoBlaze",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "test": "cypress run",
+    "test:ui": "cypress run --spec \"cypress/e2e/ui/features/**/*.feature\"",
+    "test:api": "cypress run --spec \"cypress/e2e/api/features/**/*.feature\"",
+    "test:chrome": "cypress run --browser chrome",
+    "postman:test": "newman run postman/Demoblaze_QA.postman_collection.json -e postman/Demoblaze_QA.postman_environment.json"
+  },
+  "devDependencies": {
+    "@badeball/cypress-cucumber-preprocessor": "27.0.0",
+    "@bahmutov/cypress-esbuild-preprocessor": "2.2.8",
+    "cypress": "15.21.1",
+    "esbuild": "0.25.9",
+    "newman": "6.2.2"
+  },
+  "cypress-cucumber-preprocessor": {
+    "stepDefinitions": [
+      "cypress/e2e/**/step_definitions/**/*.js"
+    ]
+  }
+}

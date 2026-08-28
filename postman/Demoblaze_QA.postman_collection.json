@@ -1,0 +1,354 @@
+{
+  "info": {
+    "_postman_id": "a8a07cb9-ccdb-4fb4-8dc0-qa-demoblaze",
+    "name": "DemoBlaze QA - Cadastro e Carrinho",
+    "description": "Collection criada para o desafio técnico QA: cadastro, login e gerenciamento básico de carrinho.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - Criar novo usuário",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const suffix = Date.now() + '_' + Math.floor(Math.random() * 100000);",
+              "pm.environment.set('username', 'qa_postman_' + suffix);",
+              "pm.environment.set('password', 'Qa@123456');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Tempo de resposta dentro do limite', function () { pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get('responseTimeLimitMs'))); });",
+              "pm.test('Cadastro não retorna erro de duplicidade', function () { pm.expect(pm.response.text()).to.not.include('This user already exist.'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{apiUrl}}/signup",
+          "host": [
+            "{{apiUrl}}"
+          ],
+          "path": [
+            "signup"
+          ]
+        }
+      }
+    },
+    {
+      "name": "02 - Cadastro duplicado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Tempo de resposta dentro do limite', function () { pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get('responseTimeLimitMs'))); });",
+              "pm.test('Informa usuário já existente', function () { pm.expect(pm.response.text()).to.include('This user already exist.'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{apiUrl}}/signup",
+          "host": [
+            "{{apiUrl}}"
+          ],
+          "path": [
+            "signup"
+          ]
+        }
+      }
+    },
+    {
+      "name": "03 - Login válido",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Tempo de resposta dentro do limite', function () { pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get('responseTimeLimitMs'))); });",
+              "pm.test('Retorna token de autenticação', function () { pm.expect(pm.response.text()).to.include('Auth_token:'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{apiUrl}}/login",
+          "host": [
+            "{{apiUrl}}"
+          ],
+          "path": [
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "04 - Login com senha inválida",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Tempo de resposta dentro do limite', function () { pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get('responseTimeLimitMs'))); });",
+              "pm.test('Informa senha incorreta', function () { pm.expect(pm.response.text()).to.include('Wrong password.'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"senha_incorreta\"\n}"
+        },
+        "url": {
+          "raw": "{{apiUrl}}/login",
+          "host": [
+            "{{apiUrl}}"
+          ],
+          "path": [
+            "login"
+          ]
+        }
+      }
+    },
+    {
+      "name": "05 - Adicionar produto 1 ao carrinho",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.environment.get('cartCookie')) { pm.environment.set('cartCookie', 'user=qa_cart_' + Date.now()); }",
+              "pm.environment.set('requestId', 'qa-' + Date.now() + '-' + Math.floor(Math.random() * 100000));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Tempo de resposta dentro do limite', function () { pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get('responseTimeLimitMs'))); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"{{requestId}}\",\n  \"cookie\": \"{{cartCookie}}\",\n  \"prod_id\": 1,\n  \"flag\": true\n}"
+        },
+        "url": {
+          "raw": "{{apiUrl}}/addtocart",
+          "host": [
+            "{{apiUrl}}"
+          ],
+          "path": [
+            "addtocart"
+          ]
+        }
+      }
+    },
+    {
+      "name": "06 - Adicionar produto 10 ao carrinho",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.environment.get('cartCookie')) { pm.environment.set('cartCookie', 'user=qa_cart_' + Date.now()); }",
+              "pm.environment.set('requestId', 'qa-' + Date.now() + '-' + Math.floor(Math.random() * 100000));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Tempo de resposta dentro do limite', function () { pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get('responseTimeLimitMs'))); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"{{requestId}}\",\n  \"cookie\": \"{{cartCookie}}\",\n  \"prod_id\": 10,\n  \"flag\": true\n}"
+        },
+        "url": {
+          "raw": "{{apiUrl}}/addtocart",
+          "host": [
+            "{{apiUrl}}"
+          ],
+          "path": [
+            "addtocart"
+          ]
+        }
+      }
+    },
+    {
+      "name": "07 - Adicionar produto 8 ao carrinho",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!pm.environment.get('cartCookie')) { pm.environment.set('cartCookie', 'user=qa_cart_' + Date.now()); }",
+              "pm.environment.set('requestId', 'qa-' + Date.now() + '-' + Math.floor(Math.random() * 100000));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Tempo de resposta dentro do limite', function () { pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get('responseTimeLimitMs'))); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"{{requestId}}\",\n  \"cookie\": \"{{cartCookie}}\",\n  \"prod_id\": 8,\n  \"flag\": true\n}"
+        },
+        "url": {
+          "raw": "{{apiUrl}}/addtocart",
+          "host": [
+            "{{apiUrl}}"
+          ],
+          "path": [
+            "addtocart"
+          ]
+        }
+      }
+    },
+    {
+      "name": "08 - Consultar carrinho",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Tempo de resposta dentro do limite', function () { pm.expect(pm.response.responseTime).to.be.below(Number(pm.environment.get('responseTimeLimitMs'))); });",
+              "pm.test('Resposta é uma lista', function () { const body = pm.response.json(); pm.expect(body).to.be.an('array'); });",
+              "pm.test('Contrato básico dos itens', function () { const body = pm.response.json(); body.forEach(item => { pm.expect(item).to.have.property('id'); pm.expect(item).to.have.property('cookie'); pm.expect(item).to.have.property('prod_id'); }); });",
+              "pm.test('Carrinho contém os três produtos', function () { const ids = pm.response.json().map(i => i.prod_id); pm.expect(ids).to.include.members([1, 10, 8]); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"cookie\": \"{{cartCookie}}\",\n  \"flag\": true\n}"
+        },
+        "url": {
+          "raw": "{{apiUrl}}/viewcart",
+          "host": [
+            "{{apiUrl}}"
+          ],
+          "path": [
+            "viewcart"
+          ]
+        }
+      }
+    }
+  ]
+}
